@@ -2,14 +2,12 @@ version: '3'
 services:
   webcam_capture:
     build:
-      context: .
-      dockerfile: Dockerfile_capture
+      context: ./client
+      dockerfile: Dockerfile
     container_name: webcam_capture_container
-    restart: unless-stopped
 
   coco_object_detection:
     build:
-      context: .
-      dockerfile: Dockerfile_detection
+      context: ./server
+      dockerfile: Dockerfile
     container_name: coco_object_detection_container
-    restart: unless-stopped
