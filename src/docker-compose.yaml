@@ -1,19 +1,15 @@
 version: '3'
 services:
-  webcam_capture:
+  client:
     build:
       context: ./client
-      dockerfile: Dockerfile
-    container_name: webcam_capture_container
-    restart: always
     ports:
-      - "8080:8080"
+      - "8081:8081"
+    # Add other client-specific configurations
 
-  coco_object_detection:
+  server:
     build:
       context: ./server
-      dockerfile: Dockerfile
-    container_name: information_extraction_container
-    restart: always
     ports:
-      - "8000:8000"
+      - "8080:8080"
+    # Add other server-specific configurations

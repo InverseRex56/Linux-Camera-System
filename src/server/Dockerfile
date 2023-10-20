@@ -1,24 +1,25 @@
 # Use the official Python image as the base image
 FROM python:3.8-slim
 
+# Update the package repositories and upgrade installed packages
+RUN apt-get update && apt-get upgrade -y && apt-get install -y procps
+
+# Install Flask using pip
+RUN pip install flask
+
 # Set the working directory in the container
 WORKDIR /app
 
+# Install Flask and requests using pip
+RUN pip install flask requests
+RUN pip install flask-cors
+
+
 # Copy the Flask application files to the container
-COPY app.py .
+COPY server.py .
 
+# Expose the port that the Flask app will run on (adjust as needed)
+EXPOSE 8080
 
-# run app
-CMD ["python", "app.py"]
-
-# # Download the COCO model configuration and checkpoint files
-# RUN mkdir model
-
-# # Expose the port that the Flask app will run on (adjust as needed)
-# EXPOSE 5000
-
-# # Define the environment variable for Flask to run in production mode
-# ENV FLASK_ENV=production
-
-# # Run the Flask application
-# CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+# Run the Flask application
+CMD ["python", "server.py"]

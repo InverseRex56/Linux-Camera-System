@@ -1,7 +1,9 @@
-### ANHTONS CODE #######
-
 import json
-import socket
+from flask import Flask, request, render_template, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
 
 class Reader:
     def __init__(self, ID=1, version_number=2, name="hello"):
@@ -32,36 +34,42 @@ class Reader:
         except json.JSONDecodeError:
             print("Error decoding the JSON data.")
 
-def start_server(port):
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('0.0.0.0', port))
-    server_socket.listen(1)
-    print(f"Server listening on port {port}")
+reader = Reader()
+config_file = "config.json"
+reader.read_config(config_file)
 
-    while True:
-        client_socket, client_addr = server_socket.accept()
-        print(f"Accepted connection from {client_addr}")
-        
-        with client_socket:
-            data = client_socket.recv(1024)
-            if data:
-                data = data.decode()
-                reader.update_config(data)
-                client_socket.sendall("Config updated successfully".encode())
-                print(f"ID: {reader.ID}")
-                print(f"Version Number: {reader.version_number}")
-                print(f"Name: {reader.name}")
-                
+# Create an empty list to store received data
+received_data_list = []
+
+@app.route('/', methods=['POST'])
+def receive_data():
+    data = request.json
+    
+    # Append the received data to the list
+    received_data_list.append(data)
+    
+    print("Received data:")
+    print(data)
+    
+    # Update the configuration based on the received data
+    reader.update_config(json.dumps(data))
+    
+    return "Config updated successfully"
+
+@app.route('/get_received_data', methods=['GET'])
+def get_received_data():
+    # Return the list of received data as JSON
+    return json.dumps(received_data_list)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/get_data', methods=['GET'])
+def get_data():
+    # Replace the following line with how you fetch your data
+    data = received_data_list
+    return jsonify(data)
 
 if __name__ == "__main__":
-    config_file = "config.json"
-    reader = Reader()
-    reader.read_config(config_file)
-    
-    # Start the server on a specific port (e.g., 8080)
-    start_server(8080)
-
-    print(f"ID: {reader.ID}")
-    print(f"Version Number: {reader.version_number}")
-    print(f"Name: {reader.name}")
-
+    app.run(host='0.0.0.0', port=8080)
