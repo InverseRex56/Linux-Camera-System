@@ -19,7 +19,8 @@ RUN pip install flask-cors
 COPY server.py .
 
 # Expose the port that the Flask app will run on (adjust as needed)
-EXPOSE 8080
+#EXPOSE 8080
+EXPOSE 8090
 
 # Run the Flask application
 CMD ["python", "server.py"]
