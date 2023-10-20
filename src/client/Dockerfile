@@ -7,11 +7,16 @@ WORKDIR /app
 # Copy the Flask application files to the container
 COPY app.py .
 
-# Expose the port that the Flask app will run on (adjust as needed)
-EXPOSE 5000
+# run app
+CMD ["run", "app.py"]
 
-# Define the environment variable for Flask to run in production mode
-ENV FLASK_ENV=production
 
-# Run the Flask application
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+
+# # Expose the port that the Flask app will run on (adjust as needed)
+# EXPOSE 5000
+
+# # Define the environment variable for Flask to run in production mode
+# ENV FLASK_ENV=production
+
+# # Run the Flask application
+# CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
