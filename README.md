@@ -1,14 +1,23 @@
 # Senior_Design
 
-To run application, ensure you have [docker](https://docs.docker.com/engine/install/) installed. Navigate over to /src, and run:
+To run application, ensure you have [docker](https://docs.docker.com/engine/install/) installed. On a terminal, run:
 ```bash
-docker compose build
-docker compose up
+cd src
+docker compose up --build
 ```
 
 
 
 # Commands:
+To view the web interface for this application, navigate to your desired web browser and enter in:
+```bash
+http://localhost:<local_machine_ui_port>
+```
+Example:
+```bash
+http://localhost:8082
+```
+
 To send data from client to server run:
 ```bash
 curl -X GET http://localhost:<local_machine_client_port>/update_and_send
