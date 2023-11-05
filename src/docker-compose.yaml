@@ -1,7 +1,7 @@
 version: '3'
 services:
 
-  db: # command to view postgresql cli: docker exec -it <db_container_id> psql -U postgres db
+  db: 
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
@@ -16,18 +16,16 @@ services:
   client:
     build:
       context: ./client
-    ports:               # left port: local machine port, right port: docker container port
+    ports:               
       - "8081:8081"
-      # - "8087:8081"    # localhost:8087 -> client docker container port 8081
     volumes:
       - ./client/config.json:/app/config.json
 
-  server:
+  network:
     build:
-      context: ./server/server
+      context: ./server/network
     ports:
       - "8080:8080"
-      # - "8086:8080"
     depends_on:
       - db
 

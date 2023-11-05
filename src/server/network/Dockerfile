@@ -16,11 +16,10 @@ RUN pip install flask-cors
 
 
 # Copy the Flask application files to the container
-COPY server.py .
+COPY network.py .
 
 # Expose the port that the Flask app will run on (adjust as needed)
 #EXPOSE 8080
-EXPOSE 8090
 
 # Run the Flask application
-CMD ["python", "server.py"]
+CMD ["python", "network.py"]
