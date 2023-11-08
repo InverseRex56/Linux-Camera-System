@@ -3,6 +3,7 @@ FROM python:3.8-slim
 
 # Update the package repositories and upgrade installed packages
 RUN apt-get update && apt-get upgrade -y && apt-get install -y procps
+RUN apt-get update && apt install iputils-ping -y
 
 # Install Flask using pip
 RUN pip install flask

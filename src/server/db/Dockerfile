@@ -1,6 +1,8 @@
 # Use the official PostgreSQL image as a base
 FROM postgres
 
+RUN apt-get update && apt install iputils-ping -y
+
 # Copy your custom initialization script and SQL file into the container
 COPY clear-db-data.sh /clear-db-data.sh
 COPY init_tables.sql /docker-entrypoint-initdb.d/init_tables.sql
