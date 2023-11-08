@@ -1,19 +1,47 @@
 version: '3'
 services:
 
+  # db: 
+  #   image: postgres
+  #   container_name: db
+  #   restart: always
+  #   environment:
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_DB: db 
+  #   volumes:
+  #     - ./server/db/clear-db-data.sh:/clear-db-data.sh
+  #     - ./server/db-data:/var/lib/postgresql/data
+  #     - ./server/db/init_tables.sql:/docker-entrypoint-initdb.d/init_tables.sql
+  #   entrypoint: ["/bin/sh", "/clear-db-data.sh"]
+  #   ports:
+  #     - '5432:5432'
   db: 
     image: postgres
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: db 
+    container_name: db
+    build:
+      context: ./server/db 
+    restart: always
     volumes:
       - ./server/db-data:/var/lib/postgresql/data
-      - ./server/db/init_tables.sql:/docker-entrypoint-initdb.d/init_tables.sql
     ports:
       - '5432:5432'
 
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - '5050:80'
+
   client:
+    image: client
+    container_name: client
+    restart: always
     build:
       context: ./client
     ports:               
@@ -22,6 +50,9 @@ services:
       - ./client/config.json:/app/config.json
 
   network:
+    image: network
+    container_name: network
+    restart: always
     build:
       context: ./server/network
     ports:
@@ -30,6 +61,9 @@ services:
       - db
 
   ui:
+    image: ui
+    container_name: ui
+    restart: always
     build:
       context: ./server/ui
     ports:
