@@ -76,6 +76,20 @@ def get_received_data():
     # Return the list of received data as JSON
     return json.dumps(received_data_list)
 
+@app.route('/get_status_data', methods=['GET'])
+def get_database_data():
+    data_db = Status.query.all()
+    data_list = []
+
+    for status in data_db:
+        data_list.append({
+            'cam_id': status.cam_id,
+            'status': status.status,
+            'most_recent_pic': status.most_recent_pic
+        })
+
+    return jsonify({'data': data_list})
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
