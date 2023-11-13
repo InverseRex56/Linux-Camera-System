@@ -5,6 +5,11 @@ To run this application, ensure you have [docker](https://docs.docker.com/engine
 cd src
 docker compose up --build
 ```
+In order to succesfully shutdown this application run:
+```bash
+cd src
+docker compose down -v
+```
 
 
 
@@ -35,6 +40,25 @@ Example:
 ```bash
 curl http://localhost:8080/get_received_data
 ```
+
+To send status data from client to database, run:
+```bash
+curl -X GET http://localhost:<local_machine_server_port>/send_status
+```
+Example:
+```bash
+curl -X GET http://localhost:8081/send_status
+```
+
+To send event data from client to database, run:
+```bash
+curl -X GET http://localhost:<local_machine_server_port>/send_event
+```
+Example:
+```bash
+curl -X GET http://localhost:8081/send_event
+```
+
 How to enter database cli:
 ```bash
 docker container ls
@@ -52,13 +76,3 @@ ab4c08ec6cb6   postgres     "docker-entrypoint.s…"  // db_container_id = ab4c0
 
 user@host:$ docker exec -it ab4c08ec6cb6 psql -U postgres db
 ```
-
-To launch pgadmin, run:
-```bash
-docker run -p 5050:80 \
-    -e 'PGADMIN_DEFAULT_EMAIL=admin@admin.com' \
-    -e 'PGADMIN_DEFAULT_PASSWORD=root' \
-    -d dpage/pgadmin4
-```
-Go to your browser and type in http:localhost:5050/browser. And log into it using email=admin@admin.com and password=root. 
-Follow the instructions on this youtube video to launch view the contents of our postgres database. 

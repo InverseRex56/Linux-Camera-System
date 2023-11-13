@@ -1,5 +1,11 @@
 {
-    "cam_id": 12,
-    "cam_status": 45,
-    "most_recent_pic": "ANAOSDF"
+    "status": {
+        "cam_id": 18,
+        "status": 19,
+        "most_recent_pic": "TWENTY"
+    },
+    "event": {
+        "cam_id": 14,
+        "event": 15
+    }
 }
