@@ -23,6 +23,7 @@ function App() {
   const [showComponent, setShowComponent] = useState(false);
 
   // Function that refreshes the data and shows/hides it.
+  /*
   function DisplayData(){
     fetch('http://localhost:8080/get_status_data')
       .then(response => response.json())
@@ -36,12 +37,35 @@ function App() {
       .then(json => setData(json))
       .catch(error => console.error(error));
   }
+  */
+  function SendStatus(){
+    fetch('http://localhost:8081/send_status')
+    .then(response => response.json())
+    .then(json => setData(json))
+    .catch(error => console.error(error));
+    fetch('http://localhost:8080/get_status_data')
+    .then(response => response.json())
+    .then(json => setData(json))
+    .catch(error => console.error(error));
+    setShowComponent(!showComponent) 
+  }
+  function SendEvents(){
+    fetch('http://localhost:8081/send_events')
+    .then(response => response.json())
+    .then(json => setData(json))
+    .catch(error => console.error(error));
+    fetch('http://localhost:8080/get_event_data')
+    .then(response => response.json())
+    .then(json => setData(json))
+    .catch(error => console.error(error));
+    setShowComponent(!showComponent) 
+  }
   return (
     <div className="App">
       <header className="App-header">
       <div><pre>{showComponent && JSON.stringify(data, null, 2) }</pre></div>
-      <Button onClick={DisplayData}>Get Info</Button>
-      <Button onClick={RefreshData}>Refresh</Button>
+      <Button onClick={SendStatus}>Get New Status Data</Button>
+      <Button onClick={SendEvents}>Get New Event Data</Button>
       </header>
     </div>
   );

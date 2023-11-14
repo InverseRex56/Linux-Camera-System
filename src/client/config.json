@@ -1,11 +1,11 @@
 {
     "status": {
-        "cam_id": 18,
-        "status": 19,
-        "most_recent_pic": "TWENTY"
+        "cam_id": 30,
+        "status": 12,
+        "most_recent_pic": "TEST2"
     },
     "event": {
-        "cam_id": 14,
+        "cam_id": 32,
         "event": 15
     }
 }

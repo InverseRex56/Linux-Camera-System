@@ -9,9 +9,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@db:5432/
 CORS(app)
 db = SQLAlchemy(app)
 
-# Create an empty list to store received data
-received_data_list = []
-
 class Status(db.Model):
     __tablename__ = 'Status'
 
@@ -59,25 +56,8 @@ def cam_events():
     db.session.commit()
     return event.jsonify()
 
-@app.route('/', methods=['POST'])
-def receive_data():
-    data = request.json
-    
-    # Append the received data to the list
-    received_data_list.append(data)
-    
-    print("Received data:")
-    print(data)
-    
-    return "Config updated successfully"
-
-@app.route('/get_received_data', methods=['GET'])
-def get_received_data():
-    # Return the list of received data as JSON
-    return json.dumps(received_data_list)
-
 @app.route('/get_status_data', methods=['GET'])
-def get_database_data():
+def get_status_data():
     data_db = Status.query.all()
     data_list = []
 
@@ -86,6 +66,20 @@ def get_database_data():
             'cam_id': status.cam_id,
             'status': status.status,
             'most_recent_pic': status.most_recent_pic
+        })
+
+    return jsonify({'data': data_list})
+
+@app.route('/get_event_data', methods=['GET'])
+def get_event_data():
+    data_db = Event.query.all()
+    data_list = []
+
+    for event in data_db:
+        data_list.append({
+            'cam_id': event.cam_id,
+            'event': event.event,
+            'sent_at': event.sent_at
         })
 
     return jsonify({'data': data_list})
