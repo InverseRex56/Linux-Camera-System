@@ -84,6 +84,75 @@ def get_event_data():
 
     return jsonify({'data': data_list})
 
+@app.route('/replace_row_data_for_status', methods=['POST'])
+def replace_row_data_for_status():
+    data = request.get_json()
+    
+    # Assuming data contains 'cam_id', 'status', and 'most_recent_pic'
+    # Replace the row in the database using the received data
+    status_to_replace = Status.query.get(data['cam_id'])
+    
+    if status_to_replace:
+        status_to_replace.status = data['status']
+        status_to_replace.most_recent_pic = data['most_recent_pic']
+        db.session.commit()
+        return status_to_replace.jsonify()
+
+    return jsonify({'message': 'Row not found'}), 404
+    
+@app.route('/replace_row_data_for_events', methods=['POST'])
+def replace_row_data_for_events():
+    data = request.get_json()
+    
+    # Assuming data contains 'cam_id', 'event', and 'sent_at'
+    # Replace the row in the database using the received data
+    event_to_replace = Event.query.get(data['cam_id'])
+    
+    if event_to_replace:
+        event_to_replace.event = data['event']
+        event_to_replace.sent_at = data['sent_at']
+        db.session.commit()
+        return event_to_replace.jsonify()
+
+    return jsonify({'message': 'Row not found'}), 404
+
+@app.route('/delete_data_in_row_for_status', methods=['POST'])
+def delete_data_in_row_for_status():
+    data = request.get_json()
+    
+    # Assuming data contains 'cam_id' representing the cam_id to be deleted
+    try:
+        cam_id_to_delete = int(data['cam_id'])
+        status_to_delete = Status.query.get(cam_id_to_delete)
+
+        if status_to_delete:
+            db.session.delete(status_to_delete)
+            db.session.commit()
+            return jsonify({'message': f'Row {cam_id_to_delete} deleted successfully'})
+
+        return jsonify({'message': 'Row not found'}), 404
+    except ValueError:
+        return jsonify({'message': 'Invalid cam_id value'}), 400
+
+@app.route('/delete_data_in_row_for_events', methods=['POST'])
+def delete_data_in_row_for_events():
+    data = request.get_json()
+    
+    # Assuming data contains 'cam_id' representing the cam_id to be deleted
+    try:
+        cam_id_to_delete = int(data['cam_id'])
+        event_to_delete = Event.query.get(cam_id_to_delete)
+
+        if event_to_delete:
+            db.session.delete(event_to_delete)
+            db.session.commit()
+            return jsonify({'message': f'Row {cam_id_to_delete} deleted successfully'})
+
+        return jsonify({'message': 'Row not found'}), 404
+    except ValueError:
+        return jsonify({'message': 'Invalid cam_id value'}), 400
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

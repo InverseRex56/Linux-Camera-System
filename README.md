@@ -76,3 +76,14 @@ ab4c08ec6cb6   postgres     "docker-entrypoint.s…"  // db_container_id = ab4c0
 
 user@host:$ docker exec -it ab4c08ec6cb6 psql -U postgres db
 ```
+
+
+curl -X POST -H "Content-Type: application/json" -d '{"cam_id": 1, "event": 42, "sent_at": "2023-11-13T12:00:00"}' http://localhost:8080/replace_row_data_for_events
+
+curl -X POST -H "Content-Type: application/json" -d '{"cam_id": 5, "status": 42, "most_recent_pic": "example.jpg"}' http://localhost:8080/replace_row_data_for_status
+
+curl -X POST -H "Content-Type: application/json" -d '{"row": 1}' http://localhost:8080/delete_data_in_row_for_events
+
+curl -X POST -H "Content-Type: application/json" -d '{"row": 1}' http://localhost:8080/delete_data_in_row_for_status
+
+
