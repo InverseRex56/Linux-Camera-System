@@ -58,6 +58,38 @@ Example:
 ```bash
 curl -X GET http://localhost:8081/send_event
 ```
+To send replace data based on cam_id for status, run:
+```bash
+curl -X POST http://localhost:5000/replace_row_data_for_status/<cam_id>/<status>/<most_recent_pic>
+```
+Example:
+```bash
+curl -X POST http://localhost:8080/replace_row_data_for_status/1/0/'image.jpg'
+```
+
+To send replace data based on cam_id for events, run:
+```bash
+curl -X POST http://localhost:5000/replace_row_data_for_events/<cam_id>/<event>/<sent_at>
+```
+
+
+To delete a row based on cam_id for events, run:
+```bash
+curl -X POST http://localhost:5000/replace_row_data_for_events/<cam_id>/<event>/<sent_at>
+```
+Example:
+```bash
+curl -X POST http://localhost:8080/delete_data_in_row_for_events/1
+```
+
+To delete a row based on cam_id for status, run:
+```bash
+curl -X POST http://localhost:5000/delete_data_in_row_for_status/<cam_id>
+```
+Example:
+```bash
+curl -X POST http://localhost:8080/delete_data_in_row_for_status/1
+```
 
 How to enter database cli:
 ```bash
@@ -76,3 +108,5 @@ ab4c08ec6cb6   postgres     "docker-entrypoint.s…"  // db_container_id = ab4c0
 
 user@host:$ docker exec -it ab4c08ec6cb6 psql -U postgres db
 ```
+
+

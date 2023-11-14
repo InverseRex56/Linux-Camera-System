@@ -84,6 +84,61 @@ def get_event_data():
 
     return jsonify({'data': data_list})
 
+@app.route('/replace_row_data_for_status/<int:cam_id>/<int:status>/<string:most_recent_pic>', methods=['POST'])
+def replace_row_data_for_status(cam_id, status, most_recent_pic):
+    # Replace the row in the database using the received data
+    status_to_replace = Status.query.get(cam_id)
+    
+    if status_to_replace:
+        status_to_replace.status = status
+        status_to_replace.most_recent_pic = most_recent_pic
+        db.session.commit()
+        return status_to_replace.jsonify()
+
+    return jsonify({'message': 'Row not found'}), 404
+    
+@app.route('/replace_row_data_for_events/<int:cam_id>/<int:event>/<string:sent_at>', methods=['POST'])
+def replace_row_data_for_events(cam_id, event, sent_at):
+    # Replace the row in the database using the received data
+    event_to_replace = Event.query.get(cam_id)
+    
+    if event_to_replace:
+        event_to_replace.event = event
+        event_to_replace.sent_at = sent_at
+        db.session.commit()
+        return event_to_replace.jsonify()
+
+    return jsonify({'message': 'Row not found'}), 404
+
+@app.route('/delete_data_in_row_for_status/<int:cam_id>', methods=['POST'])
+def delete_data_in_row_for_status(cam_id):
+    try:
+        status_to_delete = Status.query.get(cam_id)
+
+        if status_to_delete:
+            db.session.delete(status_to_delete)
+            db.session.commit()
+            return jsonify({'message': f'Row {cam_id} deleted successfully'})
+
+        return jsonify({'message': 'Row not found'}), 404
+    except ValueError:
+        return jsonify({'message': 'Invalid cam_id value'}), 400
+
+@app.route('/delete_data_in_row_for_events/<int:cam_id>', methods=['POST'])
+def delete_data_in_row_for_events(cam_id):
+    try:
+        event_to_delete = Event.query.get(cam_id)
+
+        if event_to_delete:
+            db.session.delete(event_to_delete)
+            db.session.commit()
+            return jsonify({'message': f'Row {cam_id} deleted successfully'})
+
+        return jsonify({'message': 'Row not found'}), 404
+    except ValueError:
+        return jsonify({'message': 'Invalid cam_id value'}), 400
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
