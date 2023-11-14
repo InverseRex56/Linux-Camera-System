@@ -1,6 +1,6 @@
 import './App.css';
 import styled from 'styled-components';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 
 // Uses styled components to create a styled button.
 const Button = styled.button`
@@ -20,7 +20,7 @@ function App() {
   const [data, setData] = useState(null);
 
   // Initial state of the component for data.
-  const [showComponent, setShowComponent] = useState(true);
+  const [showComponent, setShowComponent] = useState(false);
 
   // Function that refreshes the data and shows/hides it.
   function DisplayData(){
