@@ -140,11 +140,14 @@ def delete_data_in_row_for_events(cam_id):
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        db.session.add(Event(1,2))
-        db.session.add(Event(3,4))
-        db.session.add(Status(5,6, "SEVEN"))
-        db.session.add(Status(8,9, "TEN"))
-        db.session.commit()
-        app.run(host='0.0.0.0', port=8080)
+    try:
+        with app.app_context():
+            db.create_all()
+            db.session.add(Event(1,2))
+            db.session.add(Event(3,4))
+            db.session.add(Status(5,6, "SEVEN"))
+            db.session.add(Status(8,9, "TEN"))
+            db.session.commit()
+            app.run(host='0.0.0.0', port=8080)
+    except: 
+        pass      # work around: db needs to be fully initialized before network can run
