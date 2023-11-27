@@ -19,8 +19,6 @@ const ButtonGroup = styled.div`
   display: flex;
 `;
 
-
-
 function App() {
 
   // Contains the data.
@@ -36,29 +34,6 @@ function App() {
   const handleOptionChange = (event) => {
     setCurrentOption(event.target.value);
   };
-  /*
-  const QueryDataTest = () => {
-    //const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-  
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await fetch('http://localhost:8081/send_status');
-          if (!response.ok) {
-            throw new Error('Failed to fetch data');
-          }
-  
-          const result = await response.json();
-          setData(result);
-        } catch (error) {
-          setError(error.message);
-        }
-      };
-  
-      fetchData();
-    }, [])};
-    */
 
   // Function that fetches the current status data.
   function SendStatus(){  
@@ -78,24 +53,20 @@ function App() {
     setQueryStatus(false);
   }
   // Updates the data depending on which option is selected.
-  function QueryData(){
+  async function QueryData(){
     if (queryStatus === true){
-      fetch('http://localhost:8081/send_status')
+      await fetch('http://localhost:8081/send_status')
       .then(response => response.json())
       .then(json => setData(json))
-      .catch(error => console.error(error));
-      setTimeout(() => {
-        SendStatus();
-      }, 750);
+      .catch(error => console.error(error))
+      SendStatus();
     }
     else {
-      fetch('http://localhost:8081/send_event')
+      await fetch('http://localhost:8081/send_event')
       .then(response => response.json())
       .then(json => setData(json))
-      .catch(error => console.error(error));
-      setTimeout(() => {
-        SendEvent();
-      }, 750);
+      .catch(error => console.error(error))
+      SendEvent();
     }
   }
 
