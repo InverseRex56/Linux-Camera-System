@@ -10,6 +10,7 @@ COPY package*.json ./
 
 # Install application dependencies
 RUN npm install
+RUN npm install react react-router-dom
 
 # Copy the rest of the application source code to the container
 COPY . .
