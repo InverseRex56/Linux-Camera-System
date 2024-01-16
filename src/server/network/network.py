@@ -9,6 +9,34 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@db:5432/
 CORS(app)
 db = SQLAlchemy(app)
 
+
+class Camera(db.Model):
+    __tablename__ = 'Camera'
+
+    cam_id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(100))
+    is_streaming = db.Column(db.Integer)
+    
+    def __init__(self, cam_id, ip, is_streaming):
+        self.cam_id = cam_id
+        self.ip = ip
+        self.is_streaming = is_streaming
+
+    def jsonify(self):
+        return {"cam_id": self.cam_id, "ip": self.ip, "is_streaming" : self.is_streaming}
+
+@app.route('/send_camera/<int:cam_id>/<string:ip>/<int:is_streaming>', methods=['POST'])
+def send_camera(cam_id, ip, is_streaming):
+    try:
+        camera = Camera(cam_id, ip, is_streaming)
+        db.session.add(camera)
+        db.session.commit()
+        return camera.jsonify()
+    except Exception as e: 
+        print(f"Exception: {e}")
+        return jsonify({'message': f"{e}"}), 400
+
+
 class Status(db.Model):
     __tablename__ = 'Status'
 
@@ -139,15 +167,29 @@ def delete_data_in_row_for_events(cam_id):
         return jsonify({'message': 'Invalid cam_id value'}), 400
 
 
+# @app.route('/server_request/<int:cam_id>/<Command:cmd>', methods=['POST'])
+# def server_request(cam_id, cmd):
+#     cam_ip = db.get_ip(cam_id)
+#     request_ip = cam_ip + '/request'
+#     response = requests.post(request_ip, cmd)
+#     return jsonify({'message': 'Row not found'}), 404
+
+@app.route('/test')
+def test():
+    return 'this is a test'
+
+
 if __name__ == "__main__":
     try:
         with app.app_context():
             db.create_all()
-            db.session.add(Event(1,2))
-            db.session.add(Event(3,4))
-            db.session.add(Status(5,6, "SEVEN"))
-            db.session.add(Status(8,9, "TEN"))
+            # db.session.add(Event(1,2))
+            # db.session.add(Event(3,4))
+            # db.session.add(Status(5,6, "SEVEN"))
+            # db.session.add(Status(8,9, "TEN"))
+            # db.session.add(Camera(0, "192.168.1.254", False))
+            # db.session.add(Camera(1, "192.168.1.253", False))
             db.session.commit()
-            app.run(host='0.0.0.0', port=8080)
+            app.run(host='0.0.0.0', port=8080, debug=True)
     except: 
         pass      # work around: db needs to be fully initialized before network can run
