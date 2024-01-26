@@ -109,4 +109,14 @@ ab4c08ec6cb6   postgres     "docker-entrypoint.s…"  // db_container_id = ab4c0
 user@host:$ docker exec -it ab4c08ec6cb6 psql -U postgres db
 ```
 
+hosting rtsp server:
+```bash
+docker run --rm -it  -e MTX_PROTOCOLS=tcp -e MTX_WEBRTCADDITIONALHOSTS=192.168.x.x   -p 8554:8554 -p 1935:1935 -p 8888:8888 -p 8889:8889 -p 8890:8890/udp -p 8189:8189/udp   bluenviron/mediamtx
+```
 
+ffplay is used to view and ffmpeg is used to publish to rtsp
+```bash
+ffplay -rtsp_transport tcp rtsp://192.168.1.250:8554/mystream
+
+ffmpeg -re -stream_loop -1 -i dummy.mp4 -c copy -f rtsp -rtsp_transport tcp rtsp://192.168.1.250:8554/mystream
+```
