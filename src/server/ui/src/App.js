@@ -1,28 +1,29 @@
-import './App.css';
-import React from 'react';
-import { Route, Routes, Link} from 'react-router-dom';
-import Data from './pages/data';
-import Input from './pages/input';
+import { Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Camera from './components/Camera';
+import CamTimeline from './components/CamTimeline';
+import styles from './style';
+import Feed1 from './components/Feed1';
+import Feed1Settings from './components/Feed1Settings';
 
-function App() {
-  return (
-  <>
-  <nav>
-    <ul className="navlist">
-      <li>
-        <Link to="/">Data</Link>
-      </li>
-      <li>
-        <Link to="/input">Input</Link>
-      </li>
-
-    </ul>
-  </nav>
-      <Routes>
-        <Route path="/" element={<Data />} />
-        <Route path="/input" element={<Input />} />
-      </Routes> 
-  </>
-  )
-}
+const App = () => (
+  <div className="bg-primary w-full overflow-hidden">
+    <div className={`${styles.paddingX} ${styles.flexCenter}`}>
+      <div className={`${styles.boxWidth}`}>
+        <Navbar />
+        <Routes>
+          <Route path="/camera" element={<Camera />} />
+          <Route path="/timeline" element={<CamTimeline />} />
+          <Route path="/camera1" element={<Feed1 />} />
+          <Route path="/camera1/settings" element={<Feed1Settings />} />
+          <Route path="/camera2" element={<Feed1 />} />
+          <Route path="/camera3" element={<Feed1 />} />
+          <Route path="/camera4" element={<Feed1 />} />
+          <Route path="/camera5" element={<Feed1 />} />
+          <Route path="/camera6" element={<Feed1 />} />
+        </Routes>
+      </div>
+    </div>
+  </div>
+);
 export default App
