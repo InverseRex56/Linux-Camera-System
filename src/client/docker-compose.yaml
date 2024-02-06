@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  client:
+    image: client
+    container_name: client
+    restart: always
+    build:
+      context: .
+    network_mode: "host"
+    ports:
+      - "8081:8081"
+
+  rtsp-stream:
+    image: bluenviron/mediamtx:latest-ffmpeg
+    network_mode: "host"
+    devices:
+      - /dev/video0
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml

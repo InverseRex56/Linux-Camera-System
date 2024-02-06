@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -6,6 +7,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@db:5432/db'
+# ip_address=os.environ.get("IP_ADDRESS", "127.0.0.1")
+# sql_address = f"postgresql://postgres:postgres:@{ip_address}:5432/db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = sql_address
 CORS(app)
 db = SQLAlchemy(app)
 
@@ -180,6 +184,7 @@ def test():
 
 
 if __name__ == "__main__":
+    # print(f"this is the sql address: {sql_address}")
     try:
         with app.app_context():
             db.create_all()

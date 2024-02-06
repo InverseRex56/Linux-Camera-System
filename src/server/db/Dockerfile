@@ -1,7 +1,7 @@
 # Use the official PostgreSQL image as a base
 FROM postgres
 
-RUN apt-get update && apt install iputils-ping -y
+# RUN apt-get update && apt install iputils-ping -y
 
 # Set environment variables
 ENV POSTGRES_PASSWORD=postgres

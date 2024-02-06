@@ -48,5 +48,9 @@ def send_event():
         return "Error reading the JSON config file."
 
 
+@app.route('/test', methods=['GET'])
+def test():
+    return 'test'
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=8081)  # Change the port as needed
