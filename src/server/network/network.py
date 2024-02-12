@@ -1,5 +1,6 @@
 import json
 import os
+import base64
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -79,6 +80,82 @@ class Event(db.Model):
     def jsonify(self):
         return {"cam_id": self.cam_id, "event": self.event, "sent_at": self.sent_at}
 
+# database scheme for Image table
+# ip     |   time     |   path
+# string |   Datetime |   string
+    
+# json data to be sent to /save_img_db
+# { "ip": ip, "time": datetime, "payload": payload} 
+
+# steps you must take to fully implement /save_img_db:
+# 1. retreieve json data using data = request.get_json()
+# 2. convert payload(bytearray) into a .jpg image and save it to the uploadPictures folder(note:pic name should be time_ip.jpg 10:10:10_192.168.1.1.jpg)
+# 3. save the time, path, and ip to the database
+
+@app.route('/save_img_db', methods=['POST'])
+# Function to save image data to the database
+def save_img_db():
+    # Retrieve JSON data from the request
+    data = request.get_json()
+    
+    # Extract IP, time, and payload from the JSON data
+    ip = data['ip']
+    time = data['time']
+    pic = data['payload']
+    
+    # Convert the time string to a datetime object
+    time_obj = datetime.strptime(time, "%Y-%m-%d %H:%M:%S.%f")
+    
+    # Extract the time component from the datetime object
+    time_only = time_obj.time()
+    
+    # Decode the base64-encoded image data
+    img_data = base64.b64decode(pic)
+    
+    # Save the image data to a file in the uploadPictures folder
+    with open(f"uploadPictures/{time_only}_{ip}.jpg", "wb") as img_file:
+        img_file.write(img_data)
+    
+    # Create an instance of the img class with the extracted data
+    image = img(ip, time, pic)
+    
+    # Add the image to the database session
+    db.session.add(image)
+    
+    # Commit the changes to the database
+    db.session.commit()
+    
+    # Return a success message
+    return 'Image uploaded successfully'
+    
+class img(db.Model):
+    __tablename__ = 'img'
+
+    ip =  db.Column(db.String(100), primary_key=True)
+    time = db.Column(db.String(100))
+    pic = db.Column(db.String(2000))
+    
+    def __init__(self, ip, time, pic):
+        self.ip = ip
+        self.time = time
+        self.pic = pic
+
+    def jsonify(self):
+        return {"ip": self.ip, "time": self.time, "pic": self.pic}
+
+class Image(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    path = db.Column(db.String, unique=True)
+
+#get image from volume then saving raw image to database
+# primary key is ip
+# time
+@app.route('/upload_image', methods=['GET'])
+def upload_image():
+    image = Image(path=f'/app/uploadPictures/cam1.webp')
+    db.session.add(image)
+    db.session.commit()
+    return 'Image uploaded successfully'
 
 @app.route('/send_event', methods = ['POST'])
 def cam_events():
@@ -181,7 +258,6 @@ def delete_data_in_row_for_events(cam_id):
 @app.route('/test')
 def test():
     return 'this is a test'
-
 
 if __name__ == "__main__":
     # print(f"this is the sql address: {sql_address}")
