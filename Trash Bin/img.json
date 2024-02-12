@@ -1,0 +1,7 @@
+{
+    "img": {
+        "time": 2024-02-09 15:45:56.455424,  //type: datetime
+        "ip": "192.168.0.1",                 //type: string
+        "payload": "vjndsfvdkfjnvkdj"
+    }
+}
