@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+  # client service uses /dev/video2
   client:
     image: client
     container_name: client
@@ -10,7 +11,10 @@ services:
     network_mode: "host"
     ports:
       - "8081:8081"
+    devices:
+      - /dev/video2
 
+  # rtsp-stream service uses /dev/video0
   rtsp-stream:
     image: bluenviron/mediamtx:latest-ffmpeg
     network_mode: "host"
@@ -18,3 +22,5 @@ services:
       - /dev/video0
     volumes:
       - ./mediamtx.yml:/mediamtx.yml
+    restart: no
+

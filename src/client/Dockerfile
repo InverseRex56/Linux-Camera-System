@@ -5,8 +5,11 @@ FROM python:3.8-slim
 RUN apt-get update && apt-get upgrade -y && apt-get install -y procps
 RUN apt-get update && apt install iputils-ping -y
 
+COPY requirements.txt .
+
 # Install Flask and requests using pip
-RUN pip install flask requests
+# RUN pip install flask requests
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the working directory in the container
 WORKDIR /app

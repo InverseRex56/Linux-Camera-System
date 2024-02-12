@@ -1,9 +1,69 @@
 import json
 import requests
-from flask import Flask, request
+import cv2
+import datetime
+import base64
+import subprocess
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+def capture_image():
+    # Initialize USB webcam
+    cap = cv2.VideoCapture(2)
+    
+    # Check if the webcam is opened correctly
+    if not cap.isOpened():
+        raise Exception("Could not open webcam")
+    
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    
+    # Release the webcam
+    cap.release()
+    
+    # Check if the frame is captured successfully
+    if not ret:
+        raise Exception("Could not capture frame")
+    
+    return frame
+
+# Function to convert image to Base64 byte array
+def image_to_byte_array(image):
+    _, jpeg = cv2.imencode('.jpg', image)
+    return base64.b64encode(jpeg.tobytes()).decode('utf-8')
+
+@app.route('/get_picture', methods=['GET', 'POST'])
+def get_picture():
+    try:
+        # Capture image using OpenCV
+        image = capture_image()
+        
+        # Get current datetime
+        dt = datetime.datetime.now()
+        
+        # Convert image to Base64 byte array
+        picture_base64 = image_to_byte_array(image)
+        
+        # Create JSON response
+        response_data = {
+            "time": dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "picture": picture_base64
+        }
+        
+        return jsonify(response_data)
+    except Exception as e:
+        return {'error': str(e)}, 500
+
+@app.route('/start_stream')
+def start_stream():
+    subprocess.run(["sh", "/app/manage_rtsp_stream.sh", "start"])
+    return "RTSP stream started!"
+
+@app.route('/stop_stream')
+def stop_stream():
+    subprocess.run(["sh", "/app/manage_rtsp_stream.sh", "stop"])
+    return "RTSP stream stopped!"
 
 network_url = 'http://network:8080' 
 
