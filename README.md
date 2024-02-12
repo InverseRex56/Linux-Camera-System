@@ -100,6 +100,8 @@ To interact with the Postgres database command-line interface (CLI) type in the 
 ```bash
 docker container ls
 docker exec -it <db_container_id> psql -U postgres db
+\dt
+select * FROM "blank";
 ```
 
 Example:
@@ -113,3 +115,5 @@ ab4c08ec6cb6   postgres     "docker-entrypoint.s…"  // db_container_id = ab4c0
 
 user@host:$ docker exec -it ab4c08ec6cb6 psql -U postgres db
 ```
+
+

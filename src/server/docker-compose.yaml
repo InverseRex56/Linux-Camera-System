@@ -35,6 +35,8 @@ services:
         condition: service_healthy
     environment:
       - IP_ADDRESS=${IP_ADDRESS}
+    volumes:
+      - ./network/uploadPictures:/app/uploadPictures
 
   ui:
     image: ui
