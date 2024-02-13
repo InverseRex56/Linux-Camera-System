@@ -19,8 +19,8 @@ COPY client.py .
 COPY config.json .
 
 # Expose the port that the Flask app will run on (adjust as needed)
-# EXPOSE 8081
-EXPOSE 8100
+EXPOSE 8081
+# EXPOSE 8100
 
 # Run the Flask application
 CMD ["python", "client.py"]

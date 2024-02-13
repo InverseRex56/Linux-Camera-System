@@ -1,3 +1,4 @@
+import socket
 import json
 import requests
 import cv2
@@ -6,11 +7,28 @@ import base64
 import subprocess
 from flask import Flask, request, jsonify
 
+ip_address = None
 app = Flask(__name__)
+
+def get_ip_address():
+    try:
+        # Create a socket object
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        # Connect to a known server (Google's DNS server)
+        s.connect(("8.8.8.8", 80))
+
+        # Get the socket's own address (IP and port)
+        ip_address = s.getsockname()[0]
+
+        return ip_address
+    except socket.error:
+        return None
+
 
 def capture_image():
     # Initialize USB webcam
-    cap = cv2.VideoCapture(2)
+    cap = cv2.VideoCapture(0)
     
     # Check if the webcam is opened correctly
     if not cap.isOpened():
@@ -35,6 +53,8 @@ def image_to_byte_array(image):
 
 @app.route('/get_picture', methods=['GET', 'POST'])
 def get_picture():
+    ip_address = get_ip_address()
+    print(f"IP address: {ip_address}")
     try:
         # Capture image using OpenCV
         image = capture_image()
@@ -47,6 +67,7 @@ def get_picture():
         
         # Create JSON response
         response_data = {
+            "ip": ip_address,
             "time": dt.strftime("%Y-%m-%d %H:%M:%S"),
             "picture": picture_base64
         }
@@ -55,15 +76,6 @@ def get_picture():
     except Exception as e:
         return {'error': str(e)}, 500
 
-@app.route('/start_stream')
-def start_stream():
-    subprocess.run(["sh", "/app/manage_rtsp_stream.sh", "start"])
-    return "RTSP stream started!"
-
-@app.route('/stop_stream')
-def stop_stream():
-    subprocess.run(["sh", "/app/manage_rtsp_stream.sh", "stop"])
-    return "RTSP stream stopped!"
 
 network_url = 'http://network:8080' 
 
@@ -110,7 +122,9 @@ def send_event():
 
 @app.route('/test', methods=['GET'])
 def test():
-    return 'test'
+    return 'test\n'
 
 if __name__ == "__main__":
+    ip_address = get_ip_address()
+    # print(f"IP address: {ip_address}")
     app.run(host='0.0.0.0', port=8081)  # Change the port as needed

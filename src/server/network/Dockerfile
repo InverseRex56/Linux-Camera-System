@@ -16,5 +16,7 @@ COPY requirements.txt network.py ./
 
 RUN pip install -r requirements.txt
 
+EXPOSE 8081
+
 # Run the Flask application
 CMD ["python", "network.py"]

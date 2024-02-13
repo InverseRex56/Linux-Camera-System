@@ -1,26 +1,51 @@
 version: '3'
 
+# uncomment this code section for localhost networking
 services:
-  # client service uses /dev/video2
   client:
     image: client
     container_name: client
     restart: always
     build:
       context: .
-    network_mode: "host"
     ports:
       - "8081:8081"
     devices:
-      - /dev/video2
-
-  # rtsp-stream service uses /dev/video0
-  rtsp-stream:
-    image: bluenviron/mediamtx:latest-ffmpeg
-    network_mode: "host"
-    devices:
       - /dev/video0
-    volumes:
-      - ./mediamtx.yml:/mediamtx.yml
-    restart: no
+    networks:
+      - sdc-network
+
+networks:
+  sdc-network:
+    external: 
+      name: "sdc-network"
+
+
+
+
+
+# # uncomment this code for ip-based networking
+# services:
+#   client:
+#     image: client
+#     container_name: client
+#     restart: always
+#     build:
+#       context: .
+#     ports:
+#       - "8081:8081"
+#     devices:
+#       - /dev/video0
+#     network_mode: "host"
+
+#   rtsp-stream:
+#     image: bluenviron/mediamtx:latest-ffmpeg
+#     network_mode: "host"
+#     devices:
+#       - /dev/video2
+#     volumes:
+#       - ./mediamtx.yml:/mediamtx.yml
+#     restart: no
+
+
 

@@ -60,6 +60,7 @@ volumes:
 networks:
   sdc-network:
     driver: bridge
+    name: sdc-network
   
 # networks:
 #   sdc-network:
