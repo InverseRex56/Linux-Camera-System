@@ -152,10 +152,25 @@ def save_img_db():
         db.session.commit()
     
         # Return a success message
-        return 'Image uploaded successfully'
+        return 'Image uploaded successfully\n'
    
     
     
+@app.route('/get_img_for_cam/<string:ip>', methods=['POST'])
+def get_img_for_cam(ip):
+    data_db = Image.query.filter_by(ip=ip).order_by(Image.time.desc()).first()
+    data_list = []
+
+    # if data_db:
+    #     data_list = data_db.pic
+    # return jsonify(data_list)
+
+    if data_db:
+        data_list = [{
+            'pic': data_db.pic,
+            'time': data_db.time
+        }]
+    return jsonify({'data': data_list})
     
 
 #get image from volume then saving raw image to database
