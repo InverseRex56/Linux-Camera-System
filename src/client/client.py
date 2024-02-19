@@ -1,4 +1,6 @@
+import time
 import socket
+import threading
 import json
 import requests
 import cv2
@@ -77,6 +79,21 @@ def get_picture():
         return {'error': str(e)}, 500
 
 
+@app.route('/init', methods=['GET', 'POST'])
+def init():
+    # ip_address = get_ip_address()
+    remote_server_url = "http://network:8080/client_init"
+    
+    try:
+        # Sending IP address to remote server
+        response = requests.post(remote_server_url, json={'ip': ip_address})
+        if response.ok:
+            return 'IP address sent successfully to remote server.'
+        else:
+            return 'Failed to send IP address to remote server.', 500
+    except Exception as e:
+        return f'Error: {str(e)}', 500
+
 network_url = 'http://network:8080' 
 
 @app.route('/update_and_send', methods=['GET'])
@@ -126,5 +143,9 @@ def test():
 
 if __name__ == "__main__":
     ip_address = get_ip_address()
-    # print(f"IP address: {ip_address}")
-    app.run(host='0.0.0.0', port=8081)  # Change the port as needed
+
+    flask_thread = threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':8081})
+    flask_thread.start()
+
+    init()
+

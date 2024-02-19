@@ -19,29 +19,69 @@ db = SQLAlchemy(app)
 class Camera(db.Model):
     __tablename__ = 'Camera'
 
-    cam_id = db.Column(db.Integer, primary_key=True)
+    cam_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     ip = db.Column(db.String(100))
-    is_streaming = db.Column(db.Integer)
-    
-    def __init__(self, cam_id, ip, is_streaming):
-        self.cam_id = cam_id
+
+    def __init__(self, ip):
         self.ip = ip
-        self.is_streaming = is_streaming
 
     def jsonify(self):
-        return {"cam_id": self.cam_id, "ip": self.ip, "is_streaming" : self.is_streaming}
+       return {"cam_id": self.cam_id, "ip": self.ip}
 
-@app.route('/send_camera/<int:cam_id>/<string:ip>/<int:is_streaming>', methods=['POST'])
-def send_camera(cam_id, ip, is_streaming):
+
+@app.route('/client_init', methods=['GET', 'POST'])
+def client_init():
     try:
-        camera = Camera(cam_id, ip, is_streaming)
-        db.session.add(camera)
+        data = request.get_json()
+        ip = data['ip']
+
+        # checks if there is an already existing client with the same ip address
+        existing_cam = Camera.query.filter_by(ip=ip).first()
+        if existing_cam:
+            return jsonify({'message': 'Camera with this IP already exists.'}), 404
+        
+        cam = Camera(ip)
+        db.session.add(cam)
         db.session.commit()
-        return camera.jsonify()
+        print(f"ip is {ip}")
+        return cam.jsonify()
     except Exception as e: 
         print(f"Exception: {e}")
         return jsonify({'message': f"{e}"}), 400
 
+@app.route('/get_ip/<int:cam_id>', methods=['GET', 'POST'])
+def get_ip_from_id(cam_id):
+    try:
+        # Query the Camera table for the IP address corresponding to the given cam_id
+        camera = Camera.query.filter_by(cam_id=cam_id).first()
+        
+        # If a Camera instance with the given cam_id exists, return its IP address
+        if camera:
+            # return camera.ip
+
+            return jsonify({'ip': camera.ip})
+        else:
+            # return None  # Return None if no Camera instance with the given cam_id is found
+            # return f"Could not get an ip for the cam_id = {cam_id}\n"
+            return jsonify({'error': f"No camera found with the provided id {cam_id}"}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        # print(f"Exception: {e}")
+        # return None  # Return None in case of any errors
+
+
+@app.route('/get_id/<string:ip>', methods=['GET'])
+def get_id(ip):
+    try:
+        # Query the Camera table to find the cam_id associated with the given IP address
+        camera = Camera.query.filter_by(ip=ip).first()
+
+        if camera:
+            return jsonify({'cam_id': camera.cam_id})
+        else:
+            return jsonify({'error': f'No camera found with the provided IP address {ip}'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 class Status(db.Model):
     __tablename__ = 'Status'
@@ -98,20 +138,8 @@ class Image(db.Model):
     def jsonify(self):
         return {"ip": self.ip, "time": self.time, "pic": self.pic}
 
-# database scheme for Image table
-# ip     |   time     |   path
-# string |   Datetime |   string
-    
-# json data to be sent to /save_img_db
-# { "ip": ip, "time": datetime, "payload": payload} 
-
-# steps you must take to fully implement /save_img_db:
-# 1. retreieve json data using data = request.get_json()
-# 2. convert payload(bytearray) into a .jpg image and save it to the uploadPictures folder(note:pic name should be time_ip.jpg 10:10:10_192.168.1.1.jpg)
-# 3. save the time, path, and ip to the database
 
 @app.route('/save_img_db', methods=['POST'])
-# Function to save image data to the database
 def save_img_db():
     # request_ip = "http://localhost:8081/get_picture"
     request_ip = "http://client:8081/get_picture"
@@ -124,10 +152,6 @@ def save_img_db():
         ip = data['ip']
         time = data['time']
         pic = data['picture']
-
-        # print("IP:", ip)
-        # print("Time:", time)
-        # print("Picture:", pic)
 
         # Convert the time string to a datetime object
         time_obj = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
@@ -274,16 +298,11 @@ def delete_data_in_row_for_events(cam_id):
         return jsonify({'message': 'Invalid cam_id value'}), 400
 
 
-# @app.route('/server_request/<int:cam_id>/<Command:cmd>', methods=['POST'])
-# def server_request(cam_id, cmd):
-#     cam_ip = db.get_ip(cam_id)
-#     request_ip = cam_ip + '/request'
-#     response = requests.post(request_ip, cmd)
-#     return jsonify({'message': 'Row not found'}), 404
-
 @app.route('/test')
 def test():
     return 'this is a test'
+
+
 
 if __name__ == "__main__":
     # print(f"this is the sql address: {sql_address}")
