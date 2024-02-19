@@ -7,7 +7,7 @@ import Feed1 from './components/Feed1';
 import Feed1Settings from './components/Feed1Settings';
 
 const App = () => (
-  <div className="bg-primary w-full overflow-hidden">
+  <div className="bg-primary w-full h-screen overflow-auto">
     <div className={`${styles.paddingX} ${styles.flexCenter}`}>
       <div className={`${styles.boxWidth}`}>
         <Navbar />
