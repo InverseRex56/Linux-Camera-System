@@ -9,6 +9,7 @@ import base64
 import subprocess
 from flask import Flask, request, jsonify
 
+N = 20
 ip_address = None
 app = Flask(__name__)
 
@@ -78,11 +79,58 @@ def get_picture():
     except Exception as e:
         return {'error': str(e)}, 500
 
+@app.route('/ui_capture_handle', methods=['GET', 'POST'])
+def ui_capture_handle():
+    try:
+        # Capture image using OpenCV
+        image = capture_image()
+        
+        # Get current datetime
+        dt = datetime.datetime.now()
+        
+        # Convert image to Base64 byte array
+        picture_base64 = image_to_byte_array(image)
+        
+        # Create JSON response
+        response_data = {
+            "ip": ip_address,
+            "time": dt.strftime("%Y-%m-%d %H:%M:%S"),
+            "picture": picture_base64
+        }
+        
+        return jsonify(response_data)
+    except Exception as e:
+        return {'error': str(e)}, 500
 
-@app.route('/init', methods=['GET', 'POST'])
-def init():
+
+@app.route('/n_sec_pic', methods=['GET', 'POST'])
+def n_sec_pic():
+    remote_server_url = "http://network:8080/n_sec_pic_handle"
+    
+    try:
+        dt = datetime.datetime.now()
+      
+        # Capture base64 image
+        image = capture_image()
+        picture_base64 = image_to_byte_array(image)
+     
+        response = requests.post(remote_server_url, 
+                            json={'ip': ip_address,
+                                  'time': dt.strftime("%Y-%m-%d %H:%M:%S"),
+                                  'picture': picture_base64})
+                                  
+        if response.ok:
+            return 'IP address sent successfully to remote server.'
+        else:
+            return 'Failed to send IP address to remote server.', 500
+    except Exception as e:
+        return f'Error: {str(e)}', 500
+
+
+@app.route('/client_init', methods=['GET', 'POST'])
+def client_init():
     # ip_address = get_ip_address()
-    remote_server_url = "http://network:8080/client_init"
+    remote_server_url = "http://network:8080/client_init_handle"
     
     try:
         # Sending IP address to remote server
@@ -137,7 +185,7 @@ def send_event():
         return "Error reading the JSON config file."
 
 
-@app.route('/test', methods=['GET'])
+@app.route('/test', methods=['GET', 'POST'])
 def test():
     return 'test\n'
 
@@ -147,5 +195,11 @@ if __name__ == "__main__":
     flask_thread = threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':8081})
     flask_thread.start()
 
-    init()
+    client_init()
+
+    # # uncomment the code below if you want to send pictures from the client every N seconds
+    # while(1):
+    #     n_sec_pic()
+    #     time.sleep(N)
+
 

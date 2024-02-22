@@ -29,8 +29,8 @@ class Camera(db.Model):
        return {"cam_id": self.cam_id, "ip": self.ip}
 
 
-@app.route('/client_init', methods=['GET', 'POST'])
-def client_init():
+@app.route('/client_init_handle', methods=['GET', 'POST'])
+def client_init_handle():
     try:
         data = request.get_json()
         ip = data['ip']
@@ -57,17 +57,11 @@ def get_ip_from_id(cam_id):
         
         # If a Camera instance with the given cam_id exists, return its IP address
         if camera:
-            # return camera.ip
-
-            return jsonify({'ip': camera.ip})
+            return jsonify({'ip': camera.ip}), 200
         else:
-            # return None  # Return None if no Camera instance with the given cam_id is found
-            # return f"Could not get an ip for the cam_id = {cam_id}\n"
             return jsonify({'error': f"No camera found with the provided id {cam_id}"}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-        # print(f"Exception: {e}")
-        # return None  # Return None in case of any errors
 
 
 @app.route('/get_id/<string:ip>', methods=['GET'])
@@ -82,6 +76,37 @@ def get_id(ip):
             return jsonify({'error': f'No camera found with the provided IP address {ip}'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/n_sec_pic_handle', methods=['POST', 'GET'])
+def n_sec_pic_handle():
+    try:
+        data = request.get_json()
+
+        # extract json elements
+        ip = data.get('ip')
+        time = data.get('time')
+        picture = data.get('picture')
+
+        # Convert the time string to a datetime object
+        time_obj = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+        time_only = time_obj.time()
+
+        # Decode the base64-encoded image data
+        img_data = base64.b64decode(picture)
+
+        # Save the image data to a file in the uploadPictures folder
+        with open(f"uploadPictures/{time_only}_{ip}.jpg", "wb") as img_file:
+            img_file.write(img_data)
+
+
+        # Save into events data
+        image = Image(ip, time, picture)
+        db.session.add(image)  
+        db.session.commit()
+       
+        return jsonify({'message': f'event occured sucesfully'})
+    except ValueError:
+        return jsonify({'message': 'Error occured'}), 404
 
 class Status(db.Model):
     __tablename__ = 'Status'
@@ -178,6 +203,46 @@ def save_img_db():
         # Return a success message
         return 'Image uploaded successfully\n'
    
+
+@app.route('/ui_capture/<int:cam_id>', methods=['POST'])
+def ui_capture(cam_id):
+
+    request_ip = f"http://network:8080/get_ip/{cam_id}"
+    try:
+        response = requests.post(request_ip)
+        client_ip = response.json()['ip']
+        client_url = "http://" + str(client_ip) + ":8081/ui_capture_handle"
+
+        response = requests.post(client_url)
+
+        if response.status_code == 200:
+            data = response.json()
+
+            ip = data['ip']
+            time = data['time']
+            pic = data['picture']
+
+            # Convert the time string to a datetime object
+            time_obj = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+            time_only = time_obj.time()
+    
+            # Decode the base64-encoded image data
+            img_data = base64.b64decode(pic)
+
+            # Save the image data to a file in the uploadPictures folder
+            with open(f"uploadPictures/{time_only}_{ip}.jpg", "wb") as img_file:
+                img_file.write(img_data)
+        
+            # Create an instance of the img class with the extracted data
+            image = Image(ip, time, pic)
+    
+            # Add the image to the database session
+            db.session.add(image)
+            db.session.commit()
+    
+            return 'Image uploaded successfully\n'
+    except ValueError:
+        return jsonify({'message': 'Error occured'}), 404
     
     
 @app.route('/get_img_for_cam/<string:ip>', methods=['POST'])
@@ -298,10 +363,9 @@ def delete_data_in_row_for_events(cam_id):
         return jsonify({'message': 'Invalid cam_id value'}), 400
 
 
-@app.route('/test')
+@app.route('/test', methods=['POST', 'GET'])
 def test():
     return 'this is a test'
-
 
 
 if __name__ == "__main__":
