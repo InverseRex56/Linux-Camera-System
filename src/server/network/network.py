@@ -46,7 +46,6 @@ def client_init_handle():
         cam = Camera(ip, most_recent_pic)
         db.session.add(cam)
         db.session.commit()
-        print(f"ip is {ip}")
         return cam.jsonify()
     except Exception as e: 
         print(f"Exception: {e}")
@@ -196,73 +195,55 @@ def ui_capture(cam_id):
     except ValueError:
         return jsonify({'message': 'Error occured'}), 404
 
-@app.route('/change_n/<int:n>', methods=['POST'])
-def change_n(n):
-    request_ip = f"http://client:8081/change_n_handle"
-    try:
-        response = requests.post(request_ip, json={'N': n})
-        if response.ok:
-            return f'Camera id 1 event capture time N changed to {n}\n'
+  
+@app.route('/change_n/<int:cam_id>/<int:n>', methods=['POST'])
+def change_n(cam_id, n):
 
-    except ValueError:
-        return jsonify({'message': 'Error occured'}), 404
-    
+    # obtains cam_id from ip
+    request_ip = f"http://network:8080/get_ip/{cam_id}"
+    response = requests.post(request_ip)
+    if response.ok:
+        ip = (response.json())['ip']
+      
+        request_ip = f"http://{ip}:8081/change_n_handle"
+        try:
+            response = requests.post(request_ip, json={'N': n})
+            if response.ok:
+                return f'Camera id {cam_id} event capture time N changed to {n}\n'
 
-#get image from volume then saving raw image to database
-# primary key is ip
-# time
+        except ValueError:
+            return jsonify({'message': f'Request gone wrong to client with cam id {cam_id}'}), 404
+    else:
+        return jsonify({'message': f"Requested cam id {cam_id} doesn't exist in Camera table\n"})
+
+
+@app.route('/get_n/<int:cam_id>', methods=['POST'])
+def get_n(cam_id):
+
+    # obtains cam_id from ip
+    request_ip = f"http://network:8080/get_ip/{cam_id}"
+    response = requests.post(request_ip)
+    if response.ok:
+        ip = (response.json())['ip']
+      
+        request_ip = f"http://{ip}:8081/get_n_handle"
+        try:
+            response = requests.post(request_ip)
+            if response.ok:
+                n = (response.json())['N']
+                return f'Camera id {cam_id} has a value of N = {n}\n'
+
+        except ValueError:
+            return jsonify({'message': f'Request gone wrong to client with cam id {cam_id}'}), 404
+    else:
+        return jsonify({'message': f"Requested cam id {cam_id} doesn't exist in Camera table\n"})
+
 @app.route('/upload_image', methods=['GET'])
 def upload_image():
     image = Image(path=f'/app/uploadPictures/cam1.webp')
     db.session.add(image)
     db.session.commit()
     return 'Image uploaded successfully'
-
-
-
-# @app.route('/get_status_data', methods=['GET'])
-# def get_status_data():
-#     data_db = Status.query.all()
-#     data_list = []
-
-#     for status in data_db:
-#         data_list.append({
-#             'cam_id': status.cam_id,
-#             'status': status.status,
-#             'most_recent_pic': status.most_recent_pic
-#         })
-
-#     return jsonify({'data': data_list})
-
-# @app.route('/replace_row_data_for_status/<int:cam_id>/<int:status>/<string:most_recent_pic>', methods=['POST'])
-# def replace_row_data_for_status(cam_id, status, most_recent_pic):
-#     # Replace the row in the database using the received data
-#     status_to_replace = Status.query.get(cam_id)
-    
-#     if status_to_replace:
-#         status_to_replace.status = status
-#         status_to_replace.most_recent_pic = most_recent_pic
-#         db.session.commit()
-#         return status_to_replace.jsonify()
-
-#     return jsonify({'message': 'Row not found'}), 404
-    
-
-# @app.route('/delete_data_in_row_for_status/<int:cam_id>', methods=['POST'])
-# def delete_data_in_row_for_status(cam_id):
-#     try:
-#         status_to_delete = Status.query.get(cam_id)
-
-#         if status_to_delete:
-#             db.session.delete(status_to_delete)
-#             db.session.commit()
-#             return jsonify({'message': f'Row {cam_id} deleted successfully'})
-
-#         return jsonify({'message': 'Row not found'}), 404
-#     except ValueError:
-#         return jsonify({'message': 'Invalid cam_id value'}), 400
-
-
 
 
 @app.route('/test', methods=['POST', 'GET'])
@@ -276,11 +257,8 @@ if __name__ == "__main__":
         with app.app_context():
             db.create_all()
             # db.session.add(Event(1,2))
-            # db.session.add(Event(3,4))
             # db.session.add(Status(5,6, "SEVEN"))
-            # db.session.add(Status(8,9, "TEN"))
             # db.session.add(Camera(0, "192.168.1.254", False))
-            # db.session.add(Camera(1, "192.168.1.253", False))
             db.session.commit()
             app.run(host='0.0.0.0', port=8080, debug=True)
     except: 
