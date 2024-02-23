@@ -9,7 +9,7 @@ import base64
 import subprocess
 from flask import Flask, request, jsonify
 
-N = 20
+N = 15
 ip_address = None
 app = Flask(__name__)
 
@@ -102,6 +102,19 @@ def ui_capture_handle():
     except Exception as e:
         return {'error': str(e)}, 500
 
+@app.route('/change_n_handle', methods=['GET', 'POST'])
+def change_n_handle():
+    global N
+    try:
+        data = request.get_json()
+
+        n = data.get('N')
+        N = n
+
+        return jsonify({'message': f'Changed value of N to {N}'})
+    except ValueError:
+        return jsonify({'message': 'Error occured'}), 404
+
 
 @app.route('/n_sec_pic', methods=['GET', 'POST'])
 def n_sec_pic():
@@ -134,7 +147,8 @@ def client_init():
     
     try:
         # Sending IP address to remote server
-        response = requests.post(remote_server_url, json={'ip': ip_address})
+        response = requests.post(remote_server_url, json={'ip': ip_address,
+                                                          'most_recent_pic': "NONE"})
         if response.ok:
             return 'IP address sent successfully to remote server.'
         else:
@@ -197,9 +211,9 @@ if __name__ == "__main__":
 
     client_init()
 
-    # # uncomment the code below if you want to send pictures from the client every N seconds
-    # while(1):
-    #     n_sec_pic()
-    #     time.sleep(N)
+    # uncomment the code below if you want to send pictures from the client every N seconds
+    while(1):
+        n_sec_pic()
+        time.sleep(N)
 
 
