@@ -14,8 +14,8 @@ services:
       - ./config.json:/app/config.json
     devices:
       - /dev/video0
-    networks:
-      - sdc-network
+  networks:
+    - sdc-network
 
 networks:
   sdc-network:
@@ -39,6 +39,8 @@ networks:
 #     devices:
 #       - /dev/video0
 #     network_mode: "host"
+#     environment:
+#       - SERVER_IP=192.168.1.179
 
 #   rtsp-stream:
 #     image: bluenviron/mediamtx:latest-ffmpeg

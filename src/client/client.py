@@ -1,15 +1,16 @@
 import time
 import socket
-import threading
+import multiprocessing
 import json
 import requests
 import cv2
 import datetime
 import base64
-import subprocess
+import os
 from flask import Flask, request, jsonify
 
-N = 15
+N = 30
+SERVER_IP = os.environ.get("SERVER_IP", "network")
 ip_address = None
 app = Flask(__name__)
 
@@ -26,6 +27,8 @@ def get_ip_address():
 
 def capture_image():
     cap = cv2.VideoCapture(0)
+    # cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    
     if not cap.isOpened():
         raise Exception("Could not open webcam")
     
@@ -86,7 +89,7 @@ def get_n_handle():
 
 @app.route('/n_sec_pic', methods=['GET', 'POST'])
 def n_sec_pic():
-    remote_server_url = "http://network:8080/n_sec_pic_handle"
+    remote_server_url = f"http://{SERVER_IP}:8080/n_sec_pic_handle"
     
     try:
         dt = datetime.datetime.now()
@@ -110,8 +113,7 @@ def n_sec_pic():
 
 @app.route('/client_init', methods=['GET', 'POST'])
 def client_init():
-    # ip_address = get_ip_address()
-    remote_server_url = "http://network:8080/client_init_handle"
+    remote_server_url = f"http://{SERVER_IP}:8080/client_init_handle"
     
     try:
         # Sending IP address to remote server
@@ -132,8 +134,8 @@ def test():
 if __name__ == "__main__":
     ip_address = get_ip_address()
 
-    flask_thread = threading.Thread(target=app.run, kwargs={'host':'0.0.0.0', 'port':8081})
-    flask_thread.start()
+    flask_process = multiprocessing.Process(target=app.run, kwargs={'host':'0.0.0.0', 'port':8081})
+    flask_process.start()
 
     client_init()
 
