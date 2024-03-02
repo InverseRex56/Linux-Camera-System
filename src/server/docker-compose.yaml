@@ -1,3 +1,72 @@
+# version: '3'
+# services:
+
+  
+#   db: 
+#     image: postgres
+#     container_name: db
+#     build:
+#       context: ./db 
+#     restart: always
+#     volumes:
+#       - db-data:/var/lib/postgresql/data
+#     networks:
+#       - sdc-network
+#     ports:
+#       - '5432:5432'
+#     healthcheck:
+#       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+
+#   network:
+#     image: network
+#     container_name: network
+#     restart: always
+#     build:
+#       context: ./network
+#     networks:
+#       - sdc-network
+#     ports:
+#       - "8080:8080"
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#     # environment:
+#     #   - SERVER_IP=localhost 
+#     volumes:
+#       - ./network/uploadPictures:/app/uploadPictures
+
+#   ui:
+#     image: ui
+#     container_name: ui
+#     restart: always
+#     build:
+#       context: ./ui
+#     networks:
+#       - sdc-network
+#     ports:
+#       - "8082:3000"
+#     depends_on:
+#       db:
+#         condition: service_healthy
+
+
+# volumes:
+#   db-data:
+
+# networks:
+#   sdc-network:
+#     driver: bridge
+#     name: sdc-network
+  
+
+
+
+
+
+# # uncomment this section below for ip-based networking
 version: '3'
 services:
 
@@ -9,12 +78,10 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
-    networks:
-      - sdc-network
+    network_mode: host
     ports:
       - '5432:5432'
     healthcheck:
-      # test: ["CMD-SHELL", "pg_isready"]
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 5s
       timeout: 5s
@@ -27,15 +94,14 @@ services:
     restart: always
     build:
       context: ./network
-    networks:
-      - sdc-network
+    network_mode: host
     ports:
       - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      - IP_ADDRESS=${IP_ADDRESS}
+      - SERVER_IP=192.168.1.179
     volumes:
       - ./network/uploadPictures:/app/uploadPictures
 
@@ -45,8 +111,7 @@ services:
     restart: always
     build:
       context: ./ui
-    networks:
-      - sdc-network
+    network_mode: host
     ports:
       - "8082:3000"
     depends_on:
@@ -57,17 +122,3 @@ services:
 volumes:
   db-data:
 
-networks:
-  sdc-network:
-    driver: bridge
-    name: sdc-network
-  
-# networks:
-#   sdc-network:
-#     driver: macvlan
-#     driver_opts:
-#       parent: eth0
-#     ipam:
-#       driver: default
-#       config:
-#         - subnet: 169.254.0.0/16
