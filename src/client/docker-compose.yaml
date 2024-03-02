@@ -14,8 +14,8 @@ services:
       - ./config.json:/app/config.json
     devices:
       - /dev/video0
-  networks:
-    - sdc-network
+    networks:
+      - sdc-network
 
 networks:
   sdc-network:
