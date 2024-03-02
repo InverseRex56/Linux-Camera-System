@@ -1,19 +1,22 @@
-import json
 import os
+import json
 import base64
 import requests
 from datetime import datetime
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@db:5432/db'
-# ip_address=os.environ.get("IP_ADDRESS", "127.0.0.1")
-# sql_address = f"postgresql://postgres:postgres:@{ip_address}:5432/db"
-# app.config['SQLALCHEMY_DATABASE_URI'] = sql_address
-CORS(app)
+SERVER_IP = os.environ.get("SERVER_IP", "network")
+
+if SERVER_IP == "network":
+    sql_address = f"postgresql://postgres:postgres@db:5432/db"
+else:
+    sql_address = f"postgresql://postgres:postgres@{SERVER_IP}:5432/db"
+
+app.config['SQLALCHEMY_DATABASE_URI'] = sql_address
 db = SQLAlchemy(app)
+
 
 
 class Camera(db.Model):
@@ -92,7 +95,7 @@ def n_sec_pic_handle():
         picture = data.get('picture')
 
         # obtains cam_id from ip
-        request_ip = f"http://network:8080/get_id/{ip}"
+        request_ip = f"http://{SERVER_IP}:8080/get_id/{ip}"
         response = requests.post(request_ip)
         cam_id = (response.json())['cam_id']
 
@@ -147,7 +150,8 @@ class Event(db.Model):
 @app.route('/ui_capture/<int:cam_id>', methods=['POST'])
 def ui_capture(cam_id):
 
-    request_ip = f"http://network:8080/get_ip/{cam_id}"
+    # request_ip = f"http://network:8080/get_ip/{cam_id}"
+    request_ip = f"http://{SERVER_IP}:8080/get_ip/{cam_id}"
     try:
         response = requests.post(request_ip)
         client_ip = response.json()['ip']
@@ -200,12 +204,12 @@ def ui_capture(cam_id):
 def change_n(cam_id, n):
 
     # obtains cam_id from ip
-    request_ip = f"http://network:8080/get_ip/{cam_id}"
+    request_ip = f"http://{SERVER_IP}:8080/get_ip/{cam_id}"
     response = requests.post(request_ip)
     if response.ok:
-        ip = (response.json())['ip']
+        client_ip = (response.json())['ip']
       
-        request_ip = f"http://{ip}:8081/change_n_handle"
+        request_ip = f"http://{client_ip}:8081/change_n_handle"
         try:
             response = requests.post(request_ip, json={'N': n})
             if response.ok:
@@ -221,12 +225,12 @@ def change_n(cam_id, n):
 def get_n(cam_id):
 
     # obtains cam_id from ip
-    request_ip = f"http://network:8080/get_ip/{cam_id}"
+    request_ip = f"http://{SERVER_IP}:8080/get_ip/{cam_id}"
     response = requests.post(request_ip)
     if response.ok:
-        ip = (response.json())['ip']
+        client_ip = (response.json())['ip']
       
-        request_ip = f"http://{ip}:8081/get_n_handle"
+        request_ip = f"http://{client_ip}:8081/get_n_handle"
         try:
             response = requests.post(request_ip)
             if response.ok:
@@ -252,14 +256,12 @@ def test():
 
 
 if __name__ == "__main__":
-    # print(f"this is the sql address: {sql_address}")
     try:
         with app.app_context():
             db.create_all()
-            # db.session.add(Event(1,2))
-            # db.session.add(Status(5,6, "SEVEN"))
-            # db.session.add(Camera(0, "192.168.1.254", False))
+            # db.session.add(Camera("192.168.1.254", "None"))
             db.session.commit()
             app.run(host='0.0.0.0', port=8080, debug=True)
     except: 
-        pass      # work around: db needs to be fully initialized before network can run
+        pass
+
