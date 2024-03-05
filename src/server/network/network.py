@@ -5,8 +5,11 @@ import requests
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy 
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
 SERVER_IP = os.environ.get("SERVER_IP", "network")
 
 if SERVER_IP == "network":
@@ -198,6 +201,20 @@ def ui_capture(cam_id):
             return 'Image uploaded successfully\n'
     except ValueError:
         return jsonify({'message': 'Error occured'}), 404
+
+
+@app.route('/get_img/<int:cam_id>', methods=['GET', 'POST'])
+def get_img(cam_id):
+    data_db = Camera.query.filter_by(cam_id=cam_id).first()
+    data_list = []
+
+    if data_db:
+        data_list = [{
+            'ip': data_db.ip,
+            'most_recent_pic': data_db.most_recent_pic
+    }]
+
+    return data_list
 
   
 @app.route('/change_n/<int:cam_id>/<int:n>', methods=['POST'])
