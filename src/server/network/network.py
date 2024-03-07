@@ -72,6 +72,12 @@ def get_ip_from_id(cam_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Function that retrieves the largest camera ID in order to generate cameras.
+@app.route('/get_number_of_cams', methods=['POST', 'GET'])
+def get_number_of_cams():
+    largest_id = db.session.query(db.func.max(Camera.cam_id)).scalar()
+    return jsonify({'largest_cam_id': largest_id})
+
 
 @app.route('/get_id/<string:ip>', methods=['GET', 'POST'])
 def get_id(ip):

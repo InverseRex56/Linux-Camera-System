@@ -1,97 +1,72 @@
-// import React from 'react'
-// import styles from '../style';
-// import { cam1, cam2, cam4, cam5 } from '../assets';
-
-// const App = () => {
-//   const [data, setData] = useState([]);
-
-//   useEffect(() => {
-//     fetchData();
-//   }, []);
-
-//   const fetchData = async () => {
-//     try {
-//       const response = await fetch('http://localhost:8080/get_img/1');
-//       const jsonData = await response.json();
-//       setData(jsonData);
-//     } catch (error) {
-//       console.error('Error fetching data:', error);
-//     }
-//   }; 
-// }
-
-// return CameraTest = () => (
-//   <div>
-//     {data.map((item, index) => (
-//           <li key={index}>
-//             {/* <div className={`grid justify-center w-screen h-auto rounded-[10px] bg-gradient p-[2px] cursor-pointer `}><img src={`data:image/jpeg;base64,${item.most_recent_pic}`} /></div> */}
-//           </li>
-//         ))}
-//     <section id="home" className={`flex md:flex-row flex-col ${styles.paddingY}`}>
-//       <div className={`flex-1 ${styles.flexStart} flex-col xl:px-0 sm:px-16 px-6`}>
-//         <div className="flex flex-row justify-between items-center w-full">
-//           {/*First set of cameras */}
-//           <a href={"/camera1"}><div className={`${styles.flexCenter} w-[350px] h-[200px] rounded-[10px] bg-gradient p-[2px] cursor-pointer px-3 py-3`}><img src={cam1} alt="test" className="object-fill rounded-[10px]"></img></div></a>
-//           <a href={"/camera2"}><div className={`${styles.flexCenter} w-[350px] h-[200px] rounded-[10px] bg-gradient p-[2px] cursor-pointer px-3 py-3`}><img src={cam2} alt="test" className="object-fill rounded-[10px]"></img></div></a>
-//           <a href={"/camera3"}><div className={`${styles.flexCenter} w-[350px] h-[200px] rounded-[10px] bg-gradient p-[2px] cursor-pointer px-3 py-3`}><img src={cam5} alt="test" className="object-fill rounded-[10px]"></img></div></a>
-//         </div>
-
-//         <div><p>{" d"}</p></div>
-
-//         {/*Second set of cameras */}
-//         <div className="flex flex-row justify-between items-center w-full">
-//           <a href={"/camera4"}><div className={`${styles.flexCenter} w-[350px] h-[200px] rounded-[10px] bg-gradient p-[2px] cursor-pointer px-3 py-3`}><img src={cam4} alt="test" className="object-fill rounded-[10px]"></img></div></a>
-//           <a href={"/camera5"}><div className={`${styles.flexCenter} w-[350px] h-[200px] rounded-[10px] bg-gradient p-[2px] cursor-pointer px-3 py-3`}><img src={cam5} alt="test" className="object-fill rounded-[10px]"></img></div></a>
-//           <a href={"/camera6"}><div className={`${styles.flexCenter} w-[350px] h-[200px] rounded-[10px] bg-gradient p-[2px] cursor-pointer px-3 py-3`}><img src={cam1} alt="test" className="object-fill rounded-[10px]"></img></div></a>
-//         </div>
-//       </div>
-//     </section>
-//   </div>
-// )
-
-// export default CameraTest
-
-
-
-
-
-
-
-import styles from '../style';
 import React, { useState, useEffect } from 'react';
+import styles from '../style';
 
 const CameraTest = () => {
-  const [data, setData] = useState([]);
+  const [listOfCams, setListOfCams] = useState([]);
+  const [largestCamId, setLargestCamId] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    fetchLargestCamId();
   }, []);
 
-  const fetchData = async () => {
+  const fetchLargestCamId = async () => {
     try {
-      const response = await fetch('http://localhost:8080/get_img/1');
-      const jsonData = await response.json();
-      setData(jsonData);
+      const response = await fetch('http://192.168.1.179:8080/get_number_of_cams');
+      const data = await response.json();
+      setLargestCamId(data.largest_cam_id);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching largest cam ID:', error);
     }
-  }; 
+  };
 
+  useEffect(() => {
+    if (largestCamId !== null) {
+      fetchDataForCams();
+    }
+  }, [largestCamId]);
 
-  
+  const fetchDataForCams = async () => {
+    try {
+      const promises = [];
+      for (let i = 1; i <= largestCamId; i++) {
+        promises.push(fetchData(i));
+      }
+      const allData = await Promise.all(promises);
+      setListOfCams(allData);
+    } catch (error) {
+      console.error('Error fetching data for all cameras:', error);
+    }
+  };
+
+  const fetchData = async (i) => {
+    try {
+      const response = await fetch(`http://192.168.1.179:8080/get_img/${i}`);
+      return await response.json();
+    } catch (error) {
+      console.error(`Error fetching data for camera ${i}:`, error);
+      return [];
+    }
+  };
+
   return (
-    <section id="home" className={`flex md:flex-row flex-col ${styles.paddingY}`}>
-      <div className={`flex-1 ${styles.flexStart} flex-col xl:px-0 sm:px-16 px-6`}>
-        {data.map((item, index) => (
-            <div className={`grid justify-center`}><img src={`data:image/jpeg;base64,${item.most_recent_pic}`}  /><img src={`data:image/jpeg;base64,${item.most_recent_pic}`} /></div>
-        ))}
-
-      </div>
-    </section>
+    <div>
+      <section id="home" className={`flex md:flex-row flex-col ${styles.paddingY}`}>
+        <div className={`flex-1 ${styles.flexStart} flex-col xl:px-0 sm:px-16 px-6`}>
+          <div className="flex flex-row justify-between items-center w-full grid grid-cols-3 gap-1">
+            {listOfCams.map((data, index) => (
+              <a href={`/camera${index + 1}`} key={index}>
+                {data.map((item, itemIndex) => (
+                  <div className={`grid justify-center`} key={itemIndex}>
+                    <img src={`data:image/jpeg;base64,${item.most_recent_pic}`} />
+                  </div>
+                ))}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
 export default CameraTest;
-
-
-
