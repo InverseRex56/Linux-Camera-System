@@ -6,6 +6,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy 
 from flask_cors import CORS
+from sqlalchemy import desc
 
 app = Flask(__name__)
 CORS(app)
@@ -222,6 +223,21 @@ def get_img(cam_id):
 
     return data_list
 
+
+@app.route('/get_events/<int:N>', methods=['GET', 'POST'])
+def get_event(N):
+    # Query the database to get the most recent N events sorted by time
+    recent_events = Event.query.order_by(desc(Event.time)).limit(N).all()
+
+    # Extract relevant data (e.g., ip, time, pic) from the events
+    formatted_events = [{
+        'ip': event.ip,
+        'time': event.time,
+        'pic': event.pic
+    } for event in recent_events]
+
+    # Return the formatted events as JSON
+    return jsonify(formatted_events)
   
 @app.route('/change_n/<int:cam_id>/<int:n>', methods=['POST'])
 def change_n(cam_id, n):
