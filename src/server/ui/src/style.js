@@ -13,6 +13,9 @@ const styles = {
   
     marginX: "sm:mx-16 mx-6",
     marginY: "sm:my-16 my-6",
+
+    cameraHome: "bg-primary w-full h-screen overflow-auto",
+    cameraPreview: "flex flex-row justify-between items-center w-full grid grid-cols-3 gap-1",
   };
   
   export const layout = {

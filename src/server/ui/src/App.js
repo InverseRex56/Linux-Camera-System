@@ -6,16 +6,13 @@ import styles from './style';
 import Feed1 from './components/Feed1';
 import Feed1Settings from './components/Feed1Settings';
 
-import React, { useState, useEffect } from 'react';
-import CameraTest from './components/CameraTest';
-
 const App = () => (
-  <div className="bg-primary w-full h-screen overflow-auto">
+  <div className={`${styles.cameraHome}`}>
     <div className={`${styles.paddingX} ${styles.flexCenter}`}>
       <div className={`${styles.boxWidth}`}>
         <Navbar />
         <Routes>
-          <Route path="/camera" element={<CameraTest />} />
+          <Route path="/camera" element={<Camera />} />
           <Route path="/timeline" element={<CamTimeline />} />
           <Route path="/camera1" element={<Feed1 />} />
           <Route path="/camera1/settings" element={<Feed1Settings />} />
