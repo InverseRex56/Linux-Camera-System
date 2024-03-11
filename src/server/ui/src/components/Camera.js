@@ -12,6 +12,7 @@ const Camera = () => {
   // Function that will retrieve the number of cameras from the database, replace with your IP.
   const fetchLargestCamId = async () => {
     try {
+      //const response = await fetch(`http://localhost:8080/get_number_of_cams`);
       const response = await fetch('http://192.168.1.179:8080/get_number_of_cams');
       const data = await response.json();
       setLargestCamId(data.largest_cam_id);
@@ -44,6 +45,7 @@ const Camera = () => {
   // 
   const fetchData = async (i) => {
     try {
+      // const response = await fetch(`http://localhost:8080/get_img/${i}`);
       const response = await fetch(`http://192.168.1.179:8080/get_img/${i}`);
       return await response.json();
     } catch (error) {
