@@ -12,8 +12,8 @@ const Camera = () => {
   // Function that will retrieve the number of cameras from the database, replace with your IP.
   const fetchLargestCamId = async () => {
     try {
-      //const response = await fetch(`http://localhost:8080/get_number_of_cams`);
-      const response = await fetch('http://192.168.1.179:8080/get_number_of_cams');
+      // const response = await fetch(`http://localhost:8080/get_number_of_cams`);
+      const response = await fetch('http://10.166.138.213:8080/get_number_of_cams');
       const data = await response.json();
       setLargestCamId(data.largest_cam_id);
     } catch (error) {
@@ -46,7 +46,7 @@ const Camera = () => {
   const fetchData = async (i) => {
     try {
       // const response = await fetch(`http://localhost:8080/get_img/${i}`);
-      const response = await fetch(`http://192.168.1.179:8080/get_img/${i}`);
+      const response = await fetch(`http://10.166.138.213:8080/get_img/${i}`);
       return await response.json();
     } catch (error) {
       console.error(`Error fetching data for camera ${i}:`, error);
@@ -60,10 +60,11 @@ const Camera = () => {
         <div className={`flex-1 ${styles.flexStart} flex-col xl:px-0 sm:px-16 px-6`}>
           <div className={`${styles.cameraPreview}`}>
             {listOfCams.map((data, index) => (
+              // Changes the URL based on the camera ID
               <a href={`/camera${index + 1}`} key={index}>
                 {data.map((item, itemIndex) => (
-                  <div className={`grid justify-center`} key={itemIndex}>
-                    <img src={`data:image/jpeg;base64,${item.most_recent_pic}`} />
+                  <div className={`grid justify-center space-x-10`} key={itemIndex}>
+                    <img className={`rounded-[10px] hover:brightness-75`} src={`data:image/jpeg;base64,${item.most_recent_pic}`} />
                   </div>
                 ))}
               </a>

@@ -17,9 +17,9 @@ const Navbar = () => {
       {/*Unordered list that contains the options listed in navLinks. This allows for the navbar to be populated there. This object will be hidden if on mobile devices.*/}
       <ul className="list-none sm:flex hidden justify-end items-center flex-1">
         {navLinks.map((nav, index) => (
-          <li key={nav.id} className={`font-poppins font-normal cursor-pointer text-[16px] ${index === navLinks.length - 1 ? 'mr-0' : 'mr-10'} text-white`}>
+          <li key={nav.id} className={`font-poppins font-normal cursor-pointer text-[16px] ${index === navLinks.length - 1 ? 'mr-0' : 'mr-10'} text-white hover:brightness-75`}>
             {/*Creates the slug to redirect. */}
-            <a href={`${nav.id}`}>
+            <a href={`/${nav.id}`}>
               {nav.title}
             </a>
           </li>

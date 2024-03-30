@@ -1,32 +1,6 @@
 version: '3'
 
-# uncomment this code section for localhost networking
-services:
-  client:
-    image: client
-    container_name: client
-    restart: always
-    build:
-      context: .
-    ports:
-      - "8081:8081"
-    volumes:
-      - ./config.json:/app/config.json
-    devices:
-      - /dev/video0
-    networks:
-      - sdc-network
-
-networks:
-  sdc-network:
-    external: 
-      name: "sdc-network"
-
-
-
-
-
-# # uncomment this code for ip-based networking
+# # uncomment this code section for localhost networking
 # services:
 #   client:
 #     image: client
@@ -36,11 +10,37 @@ networks:
 #       context: .
 #     ports:
 #       - "8081:8081"
+#     volumes:
+#       - ./config.json:/app/config.json
 #     devices:
 #       - /dev/video0
-#     network_mode: "host"
-#     environment:
-#       - SERVER_IP=192.168.1.179
+#     networks:
+#       - sdc-network
+
+# networks:
+#   sdc-network:
+#     external: 
+#       name: "sdc-network"
+
+
+
+
+
+# uncomment this code for ip-based networking
+services:
+  client:
+    image: client
+    container_name: client
+    restart: always
+    build:
+      context: .
+    ports:
+      - "8081:8081"
+    devices:
+      - /dev/video0
+    network_mode: "host"
+    environment:
+      - SERVER_IP=10.166.138.213
 
 #   rtsp-stream:
 #     image: bluenviron/mediamtx:latest-ffmpeg

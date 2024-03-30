@@ -157,7 +157,7 @@ class Event(db.Model):
         return {"ip": self.ip, "time": self.time, "pic": self.pic}
 
 
-@app.route('/ui_capture/<int:cam_id>', methods=['POST'])
+@app.route('/ui_capture/<int:cam_id>', methods=['POST', 'GET'])
 def ui_capture(cam_id):
 
     # request_ip = f"http://network:8080/get_ip/{cam_id}"
@@ -228,6 +228,30 @@ def get_img(cam_id):
 def get_event(N):
     # Query the database to get the most recent N events sorted by time
     recent_events = Event.query.order_by(desc(Event.time)).limit(N).all()
+
+    # Extract relevant data (e.g., ip, time, pic) from the events
+    formatted_events = [{
+        'ip': event.ip,
+        'time': event.time,
+        'pic': event.pic
+    } for event in recent_events]
+
+    # Return the formatted events as JSON
+    return jsonify(formatted_events)
+
+
+@app.route('/get_cam_id_events/<int:cam_id>/<int:N>', methods=['GET', 'POST'])
+def get_cam_id_events(cam_id, N):
+
+    # obtains cam_id from ip
+    request_ip = f"http://{SERVER_IP}:8080/get_ip/{cam_id}"
+    response = requests.post(request_ip)
+    ip = (response.json())['ip']
+
+    
+    # Query the database to get the most recent N events sorted by time
+    # recent_events = Event.query.order_by(desc(Event.time)).limit(N).all()
+    recent_events = Event.query.filter_by(ip=ip).order_by(desc(Event.time)).limit(N).all()
 
     # Extract relevant data (e.g., ip, time, pic) from the events
     formatted_events = [{

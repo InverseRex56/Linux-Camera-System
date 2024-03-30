@@ -10,7 +10,7 @@ const CamTimeline = () => {
       try {
         // Fetch data from the API
         // const response = await fetch('http://localhost:8080/get_events/10');
-        const response = await fetch('http://192.168.1.179:8080/get_events/10');
+        const response = await fetch('http://10.166.138.213:8080/get_events/10');
         if (!response.ok) {
           throw new Error('Failed to fetch events');
         }
