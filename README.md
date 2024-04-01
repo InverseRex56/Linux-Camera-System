@@ -6,7 +6,7 @@ To run this application, ensure you have [docker](https://docs.docker.com/engine
 | ----------------- |
 | [Client](#Client)
 | [Viewing the RTSP Stream](#viewing-the-rtsp-stream)
-| [Network/Server](#Network/Server) 
+| [Network/Server](#Network-Server) 
 | [Database](#Database) 
 | [User Interface](#User-Interface) 
 
@@ -47,7 +47,7 @@ On VLC Viewer:
 - you should now see a real-time stream coming from your webcam. Note: You are able to view this real-time stream from any wifi-based devices in your network as long as you follow these steps to view an RTSP stream on VLC Viewer
 
 
-# Network/Server
+# Network Server
 In this project, the server is defined as the linux-based machine that hosts many different services such as:
 - Running a `Flask` server to act as a interface to forward requests between this server machine and its clients
 - Hosts a `Postgres` database to store client-based data
