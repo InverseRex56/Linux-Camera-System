@@ -2,8 +2,8 @@
 To run this application, ensure you have [docker](https://docs.docker.com/engine/install/) installed and have the docker engine launched.
 
 ## Contents
-| Functionality |  |
-| ----------------- | ------------------------------------------------------------------ |
+| Functionality |
+| ----------------- |
 | [Client](#Client)
 | [Viewing the RTSP Stream](#viewing-the-rtsp-stream)
 | [Network/Server](#Network/Server) 
