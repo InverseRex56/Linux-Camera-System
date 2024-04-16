@@ -2,24 +2,23 @@ import React, { useEffect, useState } from "react";
 import { Chrono } from "react-chrono";
 
 const CamHistory = () => {
+  // Constants that will be used to retrieve and store data.
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [cameraNumber, setCameraNumber] = useState(null);
 
-  // Extracts the current camera ID from the URL
+  // Extracts the current camera ID from the URL.
   useEffect(() => {
     const pathname = window.location.pathname;
-    // Filter for the ID
+    // Filter for the ID.
     const regex = /camera(\d+)/;
     const match = pathname.match(regex);
     
     if (match && match[1]) {
-      console.log("Match1", match[1]); // Log match for debugging
       setCameraNumber(match[1]);
-      console.log("camnum", cameraNumber); // Log match for debugging
     }
   }, []);
-
+  // Retrieves the information for each image.
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -41,8 +40,7 @@ const CamHistory = () => {
     fetchEvents();
   }, [cameraNumber]);
 
-
-
+  // Maps each information for display on the timeline.
   const items = events.map((event, index) => ({
     title: `Time: ${event.time}`,
     cardTitle: `IP: ${event.ip}`,
@@ -54,22 +52,6 @@ const CamHistory = () => {
       type: "IMAGE"
     },
   }));
-
-    // // Extracts the current camera ID from the URL
-    // useEffect(() => {
-    //   const pathname = window.location.pathname;
-    //   console.log("Pathname:", pathname); // Log pathname for debugging
-    //   // Filter for the /camera<N>/history path
-    //   const regex = /camera(\d+)\/history?/;
-    //   const match = pathname.match(regex);
-    //   console.log("Match:", match); // Log match for debugging
-    //   console.log("Match of 1:", match[1]); // Log match for debugging
-    //   // if (match && match[1]) {
-    //   setCameraNumber(parseInt(match[1]));
-    //   console.log("camnum", cameraNumber); // Log match for debugging
-    //   // }
-    // }, []);
-    
 
   return (
     <div>
@@ -87,8 +69,8 @@ const CamHistory = () => {
             titleColor: "white",
             titleColorActive: "black",
           }}
-          cardWidth={600} // Adjust card width to fit larger images
-          cardHeight={500} // Set card height to auto to accommodate varying image heights
+          cardWidth={600} // Adjust card width to fit larger images.
+          cardHeight={500} // Set card height to auto to accommodate varying image heights.
           mediaHeight={480}
         />
       )}

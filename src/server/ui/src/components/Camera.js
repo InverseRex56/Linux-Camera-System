@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import styles from '../style';
 
 const Camera = () => {
+  // Constants that will be updated with the images from the camera, as well as the largest cam ID. 
   const [listOfCams, setListOfCams] = useState([]);
   const [largestCamId, setLargestCamId] = useState(null);
 
+  // Calls the function to retrieve the highest cam ID.
   useEffect(() => {
     fetchLargestCamId();
   }, []);
@@ -12,6 +14,7 @@ const Camera = () => {
   // Function that will retrieve the number of cameras from the database, replace with your IP.
   const fetchLargestCamId = async () => {
     try {
+      // For testing purposes using localhost
       // const response = await fetch(`http://localhost:8080/get_number_of_cams`);
       const response = await fetch('http://10.166.138.213:8080/get_number_of_cams');
       const data = await response.json();
@@ -20,7 +23,8 @@ const Camera = () => {
       console.error('Error fetching largest cam ID:', error);
     }
   };
-
+  
+  // Calls the function that retrieves images from the camera only if it exists.
   useEffect(() => {
     if (largestCamId !== null) {
       fetchDataForCams();
@@ -45,6 +49,7 @@ const Camera = () => {
   // 
   const fetchData = async (i) => {
     try {
+      // For testing purposes using localhost.
       // const response = await fetch(`http://localhost:8080/get_img/${i}`);
       const response = await fetch(`http://10.166.138.213:8080/get_img/${i}`);
       return await response.json();

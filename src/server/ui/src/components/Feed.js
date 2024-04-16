@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import styles from '../style';
 
 const Feed = () => {
+  // Constants that will be used to set data to.
   const [listOfCams, setListOfCams] = useState([]);
   const [cameraNumber, setCameraNumber] = useState(null);
 
     const fetchDataForCams = async () => {
     try {
       const images = [];
-      // Loop the retrieves a picture from each camera, pushing it to the display.
+      // Loop that retrieves a picture from each camera, pushing it to the display.
         images.push(fetchData(cameraNumber));
       const allData = await Promise.all(images);
       setListOfCams(allData);
@@ -19,6 +20,7 @@ const Feed = () => {
 
   const fetchData = async (i) => {
     try {
+      // For testing purposes using localhost.
       // const response = await fetch(`http://localhost:8080/get_img/${i}`);
       const response = await fetch(`http://10.166.138.213:8080/get_img/${cameraNumber}`);
       return await response.json();
@@ -28,26 +30,24 @@ const Feed = () => {
     }
   };
 
-  // Extracts the current camera ID from the URL
+  // Extracts the current camera ID from the URL.
   useEffect(() => {
     const pathname = window.location.pathname;
-    // Filter for the ID
+    // Filter for the ID.
     const regex = /camera(\d+)/;
     const match = pathname.match(regex);
     
     if (match && match[1]) {
-      console.log("Match1", match[1]); // Log match for debugging
       setCameraNumber(match[1]);
-      console.log("camnum", cameraNumber); // Log match for debugging
     }
   }, []);
 
-  // Function that captures an image instantly, refreshing the current page
+  // Function that captures an image instantly, refreshing the current page.
   const capturePicture = async (i) => {
     try {
+      // For testing purposes using localhost.
       // const response = await fetch(`http://localhost:8080/ui_capture/${cameraNumber}`);
       const response = await fetch(`http://10.166.138.213:8080/ui_capture/${cameraNumber}`);
-      // console.log('Cam number is: ', cameraNumber);
       window.location.reload();
       return await response.json();
     } catch (error) {
@@ -55,13 +55,12 @@ const Feed = () => {
       return [];
     }
   };
-
- useEffect(() => {
-    if (cameraNumber !== null) {
-      fetchDataForCams();
-    }
-  }, [cameraNumber]);
-
+// Retrieves the data for the camera if the camera exists.
+  useEffect(() => {
+      if (cameraNumber !== null) {
+        fetchDataForCams();
+      }
+    }, [cameraNumber]);
 
   return (
   <div className={``}>

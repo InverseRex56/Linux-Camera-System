@@ -12,7 +12,6 @@ COPY package*.json ./
 RUN npm install
 RUN npm install react react-router-dom
 RUN npm install -D tailwindcss postcss autoprefixer
-RUN npx tailwindcss init
 RUN npm install react-chrono
 
 # Copy the rest of the application source code to the container
