@@ -1,4 +1,7 @@
 # Senior_Design
+
+https://github.com/InverseRex56/Open-Source-Camera-System/assets/68969347/2b8df497-b990-47c3-9c16-a2383ee35a97
+
 To run this application, ensure you have [docker](https://docs.docker.com/engine/install/) installed and have the docker engine launched.
 
 ## Contents
